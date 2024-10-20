@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Resize Your Image - AIGFace.com{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+  <h2 class="text-center text-3xl font-bold text-gray-800">Resize Your Image</h2>
+
+  <!-- Image Upload Form -->
+  <form id="upload-form" enctype="multipart/form-data" class="mt-8" method="POST">
+    {% csrf_token %}
+    <label class="block mb-4">
+      <span class="text-gray-700">Choose an Image</span>
+      <input type="file" id="image-input" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 mt-2" accept="image/*" required>
+    </label>
+
+    <!-- Image Preview -->
+    <div id="image-preview" class="hidden mt-4">
+      <h3 class="text-xl font-semibold">Image Preview</h3>
+      <img id="preview-img" src="#" alt="Preview" class="max-w-full max-h-[75vh] w-auto h-auto rounded-md shadow-md mt-2">
+    </div>
+
+    <!-- Aspect Ratio Options -->
+    <div id="aspect-ratio-options" class="hidden mt-8">
+      <h3 class="text-xl font-semibold">Select Aspect Ratio</h3>
+      <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="16:9">
+            <img src="https://placehold.co/640x360" alt="16:9 Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            16:9
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="9:16">
+            <img src="https://placehold.co/360x640" alt="9:16 Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            9:16
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="4:3">
+            <img src="https://placehold.co/480x360" alt="4:3 Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            4:3
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="3:2">
+            <img src="https://placehold.co/480x320" alt="3:2 Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            3:2
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="2:3">
+            <img src="https://placehold.co/320x480" alt="2:3 Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            2:3
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <button type="button" class="aspect-btn border border-gray-300 rounded-md w-24 h-24 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500" data-aspect="1:1">
+            <img src="https://placehold.co/300" alt="Square Aspect Ratio" class="w-full h-full object-contain rounded-md">
+            Square
+          </button>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- Form Action Buttons -->
+    <div class="flex justify-between items-center mt-8">
+      <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Convert</button>
+      <button type="button" id="reset-btn" class="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">Reset</button>
+    </div>
+  </form>
+
+  <!-- Output Section for Resized Image -->
+  <div id="output-section" class="hidden mt-8 text-center">
+    <h3 class="text-xl font-semibold mb-4">Resized Image</h3>
+    <img id="resized-img" src="#" alt="Resized Preview" class="max-w-full max-h-[75vh] rounded-md shadow-lg w-auto h-auto">
+
+    <!-- URL Section -->
+    <div class="mt-4">
+      <label for="image-url" class="block font-semibold">Image URL:</label>
+      <div class="flex items-center mt-2">
+        <input type="text" id="image-url" class="w-full text-sm text-gray-500 border rounded-lg px-4 py-2" readonly>
+        <button id="copy-url-btn" class="ml-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">Copy URL</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const imageInput = document.getElementById('image-input');
+  const aspectRatioOptions = document.getElementById('aspect-ratio-options');
+  const imagePreview = document.getElementById('image-preview');
+  const previewImg = document.getElementById('preview-img');
+  const uploadForm = document.getElementById('upload-form');
+  const outputSection = document.getElementById('output-section');
+  const resizedImg = document.getElementById('resized-img');
+  const downloadLink = document.getElementById('download-link');
+  let selectedAspectRatio = '';
+
+  // Function to get CSRF token
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  // Show image preview on file selection
+  imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        imagePreview.classList.remove('hidden');
+        aspectRatioOptions.classList.remove('hidden');
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Handle aspect ratio selection
+  document.querySelectorAll('.aspect-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      // Clear the selection from all buttons
+      document.querySelectorAll('.aspect-btn').forEach(btn => {
+        btn.classList.remove('bg-orange-500', 'text-white');
+        btn.classList.add('border-gray-300'); // Reset border to default
+      });
+
+      // Highlight the selected button
+      selectedAspectRatio = this.dataset.aspect;
+      this.classList.add('bg-orange-500', 'text-white');
+      this.classList.remove('border-gray-300'); // Remove default border for selected
+    });
+  });
+
+  // Handle image upload and resize
+  uploadForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (!selectedAspectRatio) {
+      console.error('No aspect ratio selected!');
+      return; // Exit if no aspect ratio is selected
+    }
+
+    let formData = new FormData();
+    formData.append('file', imageInput.files[0]);
+    formData.append('aspect_ratio', selectedAspectRatio);
+
+    const csrftoken = getCookie('csrftoken'); // Get the CSRF token
+
+    console.log('Preparing to send data:', formData);
+    console.log('Selected aspect ratio:', selectedAspectRatio);
+
+    fetch('{% url "resizer:home" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrftoken, // Include the CSRF token in the request
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.url) {
+        resizedImg.src = data.url; // Set resized image URL
+        document.getElementById('image-url').value = data.url; // Correctly set URL in input
+        outputSection.classList.remove('hidden');
+      } else {
+        console.error('No URL returned from the server');
+      }
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
+  });
+
+  // Copy URL to clipboard
+  document.getElementById('copy-url-btn').addEventListener('click', function() {
+    const imageUrlInput = document.getElementById('image-url');
+    imageUrlInput.select();
+    document.execCommand('copy');
+  });
+
+  // Reset the form
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    uploadForm.reset();
+    imagePreview.classList.add('hidden');
+    aspectRatioOptions.classList.add('hidden');
+    outputSection.classList.add('hidden');
+    selectedAspectRatio = '';
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+{% load static tailwind_tags %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AIGFace.com{% endblock %}</title>
+    {% tailwind_css %}
+    <style>
+        /* Custom styles for dropdown */
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-orange-500 font-bold text-xl">AIGFace</div>
+            <div class="flex items-center space-x-6">
+                <a href="#" class="text-gray-700 hover:text-orange-500">Image Resizer</a>
+                <a href="#" class="text-gray-700 hover:text-orange-500">Image Repair</a>
+                <!-- Login Button -->
+                <a href="#" class="bg-orange-500 text-white px-4 py-2 rounded-lg">Log in</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-12 py-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Support</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">Pricing</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Legal</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Discover AI</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">GPT 4.0</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">AI Music</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">More Tools</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">AI Video Editor</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-orange-500">AI Text Generator</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-gray-600">
+                <p>&copy; 2024 AIGFace.com. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('dropdownButton');
+            const menu = document.getElementById('dropdownMenu');
+
+            button.addEventListener('click', function() {
+                menu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!button.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
