@@ -75,15 +75,6 @@
   <div id="output-section" class="hidden mt-8 text-center">
     <h3 class="text-xl font-semibold mb-4">Resized Image</h3>
     <img id="resized-img" src="#" alt="Resized Preview" class="max-w-full max-h-[75vh] rounded-md shadow-lg w-auto h-auto">
-
-    <!-- URL Section -->
-    <div class="mt-4">
-      <label for="image-url" class="block font-semibold">Image URL:</label>
-      <div class="flex items-center mt-2">
-        <input type="text" id="image-url" class="w-full text-sm text-gray-500 border rounded-lg px-4 py-2" readonly>
-        <button id="copy-url-btn" class="ml-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">Copy URL</button>
-      </div>
-    </div>
   </div>
 
 </div>
@@ -150,8 +141,8 @@
     e.preventDefault();
 
     if (!selectedAspectRatio) {
-      console.error('No aspect ratio selected!');
-      return; // Exit if no aspect ratio is selected
+        console.error('No aspect ratio selected!');
+        return; // Exit if no aspect ratio is selected
     }
 
     let formData = new FormData();
@@ -160,45 +151,32 @@
 
     const csrftoken = getCookie('csrftoken'); // Get the CSRF token
 
-    console.log('Preparing to send data:', formData);
-    console.log('Selected aspect ratio:', selectedAspectRatio);
-
     fetch('{% url "resizer:home" %}', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': csrftoken, // Include the CSRF token in the request
-      },
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken, // Include the CSRF token in the request
+        },
     })
     .then(response => response.json())
     .then(data => {
-      if (data.url) {
-        resizedImg.src = data.url; // Set resized image URL
-        document.getElementById('image-url').value = data.url; // Correctly set URL in input
-        outputSection.classList.remove('hidden');
-      } else {
-        console.error('No URL returned from the server');
-      }
+        if (data.image_base64) {
+            // Create a base64 URL and set it as the source of the image
+            resizedImg.src = `data:image/${data.format};base64,${data.image_base64}`;
+            outputSection.classList.remove('hidden');
+        } else {
+            console.error('Error in the image processing');
+        }
     })
     .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
+        console.error('There was a problem with the fetch operation:', error);
     });
-  });
-
-  // Copy URL to clipboard
-  document.getElementById('copy-url-btn').addEventListener('click', function() {
-    const imageUrlInput = document.getElementById('image-url');
-    imageUrlInput.select();
-    document.execCommand('copy');
-  });
+});
 
   // Reset the form
   document.getElementById('reset-btn').addEventListener('click', function() {
-    uploadForm.reset();
-    imagePreview.classList.add('hidden');
-    aspectRatioOptions.classList.add('hidden');
-    outputSection.classList.add('hidden');
-    selectedAspectRatio = '';
-  });
+    window.location.reload();
+});
+
 </script>
 {% endblock %}
