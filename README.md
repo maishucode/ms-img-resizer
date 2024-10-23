@@ -42,34 +42,45 @@
 
 1. 服务器设置，创建服务器时，上传本项目根目录下的`env_setup.sh`文件作为User Data Script
 
-2. 登录服务器后，首先下载代码：
+2. 登录到服务器
+   进入你的key保存目录，对我来说是ms1024.key，运行如下命令：
+   ```bash
+   chmod 400 ms1024.key
+   ssh -i ms1024.key ec2-user@<public IP address>
+   ```
+3. 登录服务器后，首先下载代码：
 
    ```shell
    cd /home/ec2-user
-   git clone https://github.com/maishucode/MsImageResizer.git
+   git clone https://github.com/maishucode/ms-img-resizer.git
    ```
    
 
-3. 进入/home/ec2-user下的MsImageResizer目录，运行以下命令：
+4. 进入/home/ec2-user下的MsImageResizer目录，运行以下命令：
 
    ```shell
+   chmod +x python_setup.sh
    ./python_setup.sh
    ```
 
    这个命令可能要运行好几分钟，耐心等待命令执行完成。
 
-4. 安装项目所需的Python包。进入项目根目录，执行如下命令：
+5. 安装项目所需的Python包。进入项目根目录，执行如下命令：
 
    ```shell
    python -m pip install -r requirements.txt
    ```
 
-5. 启动Django项目。在项目根目录下执行：
+6. 启动Django项目。在项目根目录下执行：
 
    ```shell
    python manage.py runserver
    ```
+   上面的命令，有一点问题，当你退出窗口，服务就停掉了。如果想一直运行，可以使用下面的命令：
+   ```shell
+   nohup python manage.py runserver 0.0.0.0:8000 &
+   ```
 
-6. 访问网站。如果以下步骤都顺利执行，应该可以通过以下网址访问网站：
+7. 访问网站。如果以下步骤都顺利执行，应该可以通过以下网址访问网站：
 
    http://<EC2的公共IP地址>/
