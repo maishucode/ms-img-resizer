@@ -32,7 +32,7 @@
 
    > python manage.py runserver
 
-   成功启动后，可以在以下URL访问网站：http://http://127.0.0.1:8000/
+   成功启动后，可以在以下URL访问网站：http://127.0.0.1:8000/
 
 
 
@@ -48,17 +48,9 @@
    cd /home/ec2-user
    git clone https://github.com/maishucode/MsImageResizer.git
    ```
-
-3. 更新S3的Access Key。打开s3_util.py，用你的key更新以下代码：
-
-   ```python
-   ACCESS_KEY = 'change to your key' #change to your key
-   SECRET_KEY = 'change to your key' #change to your key
-   ```
-
    
 
-4. 进入/home/ec2-user下的MsImageResizer目录，运行以下命令：
+3. 进入/home/ec2-user下的MsImageResizer目录，运行以下命令：
 
    ```shell
    ./python_setup.sh
@@ -66,18 +58,18 @@
 
    这个命令可能要运行好几分钟，耐心等待命令执行完成。
 
-5. 安装项目所需的Python包。进入项目根目录，执行如下命令：
+4. 安装项目所需的Python包。进入项目根目录，执行如下命令：
 
    ```shell
    python -m pip install -r requirements.txt
    ```
 
-6. 启动Django项目。在项目根目录下执行：
+5. 启动Django项目。在项目根目录下执行：
 
    ```shell
    python manage.py runserver
    ```
 
-7. 访问网站。如果以下步骤都顺利执行，应该可以通过以下网址访问网站：
+6. 访问网站。如果以下步骤都顺利执行，应该可以通过以下网址访问网站：
 
    http://<EC2的公共IP地址>/
